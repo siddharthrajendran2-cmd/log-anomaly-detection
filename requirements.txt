@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+scikit-learn
+sentence-transformers
+faiss-cpu
+pandas
+numpy
+pydantic
+faker
+streamlit
+pytest
