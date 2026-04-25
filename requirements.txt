@@ -9,3 +9,4 @@ pydantic
 faker
 streamlit
 pytest
+redis
