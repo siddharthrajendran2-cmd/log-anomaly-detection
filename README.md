@@ -1,4 +1,5 @@
 # 🧠 Intelligent Log Anomaly Detection System
+![CI](https://github.com/siddharthrajendran2-cmd/log-anomaly-detection/actions/workflows/ci.yml/badge.svg)
 
 A production-grade platform that ingests logs from distributed services in real-time, uses transformer-based ML to detect anomalies, and generates root cause explanations via a RAG pipeline.
 

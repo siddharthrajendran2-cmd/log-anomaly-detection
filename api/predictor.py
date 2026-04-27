@@ -103,8 +103,8 @@ class AnomalyPredictor:
         is_anomaly = pred == -1
 
         result = {
-            "is_anomaly": is_anomaly,
-            "anomaly_score": round(score, 4),
+            "is_anomaly": bool(is_anomaly),  # convert numpy.bool to Python bool
+            "anomaly_score": round(float(score), 4),
             "severity": self.get_severity(score) if is_anomaly else "NONE",
             "log": log,
             "similar_cases": None,
@@ -122,7 +122,10 @@ class AnomalyPredictor:
         return result
 
     def get_recent_anomalies(self, limit=10):
-        return self.recent_anomalies[:limit]
+        return [
+            {k: v for k, v in a.items() if k != "log"}
+            for a in self.recent_anomalies[:limit]
+        ]
 
     def explain(self, log_id: int):
         if log_id >= len(self.df):
