@@ -195,30 +195,4 @@ if __name__ == "__main__":
     print(f"P95 latency:             {seq_results['p95_latency']:.1f}ms")
     print(f"Total logs processed:    {100 + 200 + 1000}")
     print(f"\n✅ Stress test complete.")
-    # Add to bottom of stress_test.py and run separately
-def run_cache_test(count=50):
-    print(f"\n{'='*50}")
-    print(f"CACHE TEST — same log {count} times")
-    print(f"{'='*50}")
     
-    log = {
-        "service": "payment-service",
-        "endpoint": "/checkout",
-        "method": "POST",
-        "status_code": 500,
-        "latency_ms": 7500.0
-    }
-    
-    latencies = []
-    for i in range(count):
-        start = time.time()
-        requests.post(f"{API_URL}/ingest", json=log, timeout=30)
-        latencies.append((time.time() - start) * 1000)
-    
-    first = latencies[0]
-    cached = latencies[1:]
-    print(f"  First request (no cache):  {first:.1f}ms")
-    print(f"  Cached avg (hits):         {sum(cached)/len(cached):.1f}ms")
-    print(f"  Speedup:                   {first/( sum(cached)/len(cached)):.1f}x faster")
-
-run_cache_test()
