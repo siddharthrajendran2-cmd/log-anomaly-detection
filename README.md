@@ -48,9 +48,13 @@ http://localhost:8000/docs
 
 ## Benchmarks
 - Anomaly detection recall: **91%**
-- False positive rate: **4%**
-- FAISS similarity search: sub-millisecond
-- API response time: ~200ms per log (including embedding generation)
+- Concurrent throughput: **4.3 requests/sec** (CPU-bound, embedding generation)
+- Batch throughput: **5.1 logs/sec**
+- Cache speedup: **Xx faster** on repeated patterns
+- Total logs stress tested: **1,300**
+
+> Note: Latency is CPU-bound due to on-device transformer inference.
+> Production deployment would use GPU inference or pre-computed embedding cache.
 
 ## Sample Response
 ```json
