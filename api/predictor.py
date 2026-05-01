@@ -1,3 +1,8 @@
+import os
+from dotenv import load_dotenv
+from groq import Groq
+
+load_dotenv()
 import numpy as np
 import pandas as pd
 import faiss
@@ -58,8 +63,16 @@ class AnomalyPredictor:
             if len(similar) == k:
                 break
         return similar
+    
 
     def generate_explanation(self, log, similar_cases):
+    # Try Groq LLM first, fall back to rule-based
+        try:
+            return self._llm_explanation(log, similar_cases)
+        except Exception as e:
+            print(f"LLM explanation failed: {e}, falling back to rule-based")
+            return self._rule_based_explanation(log, similar_cases)
+    def _rule_based_explanation(self, log, similar_cases):
         service = log['service']
         status = log['status_code']
         latency = log['latency_ms']
@@ -82,7 +95,34 @@ class AnomalyPredictor:
 
         return (f"Anomaly on {service}{log['endpoint']} — {issue}. "
                 f"With {similar_text}, this pattern suggests recurring instability. {action}.")
+    def _llm_explanation(self, log, similar_cases):
+        client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+        
+        context = "\n".join([
+            f"- {c['service']} hit {c['endpoint']} with status {c['status_code']} and latency {c['latency_ms']}ms"
+            for c in similar_cases
+        ]) if similar_cases else "No similar past incidents found."
 
+        prompt = f"""You are a site reliability engineer analyzing a system anomaly.
+
+    Current anomaly:
+    - Service: {log['service']}
+    - Endpoint: {log['endpoint']}
+    - Status code: {log['status_code']}
+    - Latency: {log['latency_ms']}ms
+
+    Similar past incidents:
+    {context}
+
+    In 2-3 sentences, explain what likely went wrong and what the on-call engineer should check first. Be specific and technical."""
+
+        response = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=200,
+            temperature=0.3
+        )
+        return response.choices[0].message.content.strip()
     def predict(self, log: dict):
         # Build features
         text = self.log_to_text(log)

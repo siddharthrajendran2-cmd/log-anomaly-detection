@@ -55,7 +55,8 @@ http://localhost:8000/docs
 
 > Note: Latency is CPU-bound due to on-device transformer inference.
 > Production deployment would use GPU inference or pre-computed embedding cache.
-
+## Dashboard
+![Dashboard](dashboard-screenshot.png)
 ## Sample Response
 ```json
 {
